@@ -34,35 +34,31 @@ public class MoneyTransferTest {
 
     @Test
     void shouldTransferMoneyBetweenOwnCardsV1() {
-//        $("[data-test-id=action-deposit]").click();
         cards.first().click();
         var sendMoney = new SendMoneyPage();
         sendMoney.sendMoney(20, "0002");
-        int actual = 10_020;
-        int excepted = dashboardPage.getCardBalance("0001");
-        assertEquals(excepted, actual);
-
+        int expected = 10_020;
+        int actual = dashboardPage.getCardBalance("0001");
+        assertEquals(expected, actual);
     }
 
     @Test
     void shouldTransferMoneyBetweenOwnCardsV2() {
-//        $("[data-test-id=action-deposit]").click();
         cards.last().click();
         var sendMoney = new SendMoneyPage();
         sendMoney.sendMoney(20, "0001");
-        int actual = 10_020;
-        int excepted = dashboardPage.getCardBalance("0002");
-        assertEquals(excepted, actual);
+        int expected = 10_020;
+        int actual = dashboardPage.getCardBalance("0002");
+        assertEquals(expected, actual);
     }
 
     @Test
-    void shouldTransferMoneyBetweenOverLimit() {
-//        $("[data-test-id=action-deposit]").click();
+    void shouldTransferMoneyOverLimit() {
         cards.last().click();
         var sendMoney = new SendMoneyPage();
         sendMoney.sendMoney(30_000, "0001");
-        int actual = 40_000;
-        int excepted = dashboardPage.getCardBalance("0002");
-        assertEquals(excepted, actual);
+        int expected = 20_000;
+        int actual = dashboardPage.getCardBalance("0002");
+        assertEquals(expected, actual);
     }
 }
