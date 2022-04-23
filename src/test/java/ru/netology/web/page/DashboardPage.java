@@ -1,12 +1,10 @@
 package ru.netology.web.page;
 
-import com.codeborne.selenide.ElementsCollection;
-
+import com.codeborne.selenide.Condition;
 import static com.codeborne.selenide.Selenide.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DashboardPage {
-    private ElementsCollection cards = $$(".list__item");
+
     private final String balanceStart = ", баланс: ";
     private final String balanceFinish = " р.";
 
@@ -14,16 +12,8 @@ public class DashboardPage {
     }
 
     public int getCardBalance(String id) {
-        cards = $$(".list__item");
-        var text = "";
-        int size = cards.size();
-        for (int i = 0; i < size; i++) {
-            var txt = cards.get(i).text();
-            String txtId = extractId(txt);
-            if (txtId.equals(id)) {
-                text = txt;
-            }
-        }
+        String shortId = id.substring(15, 19);
+        String text = $$(".list__item").findBy(Condition.text(shortId)).text();
         return extractBalance(text);
     }
 
@@ -39,4 +29,15 @@ public class DashboardPage {
         String idText = text.substring(15, finish);
         return idText;
     }
+
+    public void sendMoneyById(int money, String id,String writeOffCard) {
+//        ElementsCollection cards = $$("[data-test-id=action-deposit]");
+//        cards.first().click();
+        String shortId = id.substring(15, 19);
+        $$(".list__item").find(Condition.text(shortId)).$( "[data-test-id=action-deposit]").click();
+        var sendMoney = new SendMoneyPage();
+        sendMoney.sendMoney(money, writeOffCard);
+    }
+
+    ;
 }
