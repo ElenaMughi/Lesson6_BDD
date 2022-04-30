@@ -1,6 +1,8 @@
 package ru.netology.web.page;
 
 import com.codeborne.selenide.Condition;
+import org.openqa.selenium.interactions.SendKeysAction;
+
 import static com.codeborne.selenide.Selenide.*;
 
 public class DashboardPage {
@@ -30,13 +32,10 @@ public class DashboardPage {
         return idText;
     }
 
-    public void sendMoneyById(int money, String id,String writeOffCard) {
-//        ElementsCollection cards = $$("[data-test-id=action-deposit]");
-//        cards.first().click();
+    public SendMoneyPage sendMoneyById(String id) {
         String shortId = id.substring(15, 19);
         $$(".list__item").find(Condition.text(shortId)).$( "[data-test-id=action-deposit]").click();
-        var sendMoney = new SendMoneyPage();
-        sendMoney.sendMoney(money, writeOffCard);
+        return new SendMoneyPage();
     }
 
     ;

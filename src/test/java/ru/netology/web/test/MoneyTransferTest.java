@@ -12,6 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MoneyTransferTest {
 
     private DashboardPage dashboardPage;
+    private DataInfo.CardInfo cardInfo;
+    private DataInfo.CardInfo cardAnotherInfo;
 
     @BeforeEach
     public void logIn() {
@@ -21,57 +23,79 @@ public class MoneyTransferTest {
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataInfo.getVerificationCodeFor();
         dashboardPage = verificationPage.validCode(verificationCode);
+        cardInfo = DataInfo.getCardInfo();
+        cardAnotherInfo = DataInfo.getAnotherCardInfo();
     }
 
     @Test
     void shouldTransferMoneyBetweenOwnCardsV1() {
-        int expected = dashboardPage.getCardBalance("5559 0000 0000 0001") + 20;
-        int expected2 = dashboardPage.getCardBalance("5559 0000 0000 0002") - 20;
 
-        dashboardPage.sendMoneyById(20, "5559 0000 0000 0001","5559 0000 0000 0002");
+        int expected = dashboardPage.getCardBalance(cardInfo.getNumber()) + 20;
+        int expected2 = dashboardPage.getCardBalance(cardAnotherInfo.getNumber()) - 20;
 
-        int actual = dashboardPage.getCardBalance("5559 0000 0000 0001");
+        var sendMoney = dashboardPage.sendMoneyById(cardInfo.getNumber());
+        sendMoney.sendMoney(20, cardAnotherInfo.getNumber());
+
+        int actual = dashboardPage.getCardBalance(cardInfo.getNumber());
         assertEquals(expected, actual);
-        int actual2 = dashboardPage.getCardBalance("5559 0000 0000 0002");
+        int actual2 = dashboardPage.getCardBalance(cardAnotherInfo.getNumber());
         assertEquals(expected2, actual2);
     }
 
     @Test
     void shouldTransferMoneyBetweenOwnCardsV2() {
-        int expected = dashboardPage.getCardBalance("5559 0000 0000 0001") - 20;
-        int expected2 = dashboardPage.getCardBalance("5559 0000 0000 0002") + 20;
+        int expected = dashboardPage.getCardBalance(cardInfo.getNumber()) - 20;
+        int expected2 = dashboardPage.getCardBalance(cardAnotherInfo.getNumber()) + 20;
 
-        dashboardPage.sendMoneyById(20, "5559 0000 0000 0002", "5559 0000 0000 0001");
+        var sendMoney = dashboardPage.sendMoneyById(cardAnotherInfo.getNumber());
+        sendMoney.sendMoney(20, cardInfo.getNumber());
 
-        int actual = dashboardPage.getCardBalance("5559 0000 0000 0001");
+        int actual = dashboardPage.getCardBalance(cardInfo.getNumber());
         assertEquals(expected, actual);
-        int actual2 = dashboardPage.getCardBalance("5559 0000 0000 0002");
+        int actual2 = dashboardPage.getCardBalance(cardAnotherInfo.getNumber());
         assertEquals(expected2, actual2);
     }
 
     @Test
     void shouldTransferMoneyFirstCard() {
-        int expected = dashboardPage.getCardBalance("5559 0000 0000 0001");
-        int expected2 = dashboardPage.getCardBalance("5559 0000 0000 0002");
+        int expected = dashboardPage.getCardBalance(cardInfo.getNumber());
+        int expected2 = dashboardPage.getCardBalance(cardAnotherInfo.getNumber());
 
-        dashboardPage.sendMoneyById(20, "5559 0000 0000 0001", "5559 0000 0000 0001");
+        var sendMoney = dashboardPage.sendMoneyById(cardInfo.getNumber());
+        sendMoney.sendMoney(20, cardInfo.getNumber());
 
-        int actual = dashboardPage.getCardBalance("5559 0000 0000 0001");
+        int actual = dashboardPage.getCardBalance(cardInfo.getNumber());
         assertEquals(expected, actual);
-        int actual2 = dashboardPage.getCardBalance("5559 0000 0000 0002");
+        int actual2 = dashboardPage.getCardBalance(cardAnotherInfo.getNumber());
         assertEquals(expected2, actual2);
     }
 
     @Test
     void shouldTransferMoneySecondCard() {
-        int expected = dashboardPage.getCardBalance("5559 0000 0000 0001");
-        int expected2 = dashboardPage.getCardBalance("5559 0000 0000 0002");
+        int expected = dashboardPage.getCardBalance(cardInfo.getNumber());
+        int expected2 = dashboardPage.getCardBalance(cardAnotherInfo.getNumber());
 
-        dashboardPage.sendMoneyById(20, "5559 0000 0000 0002", "5559 0000 0000 0002");
+        var sendMoney = dashboardPage.sendMoneyById(cardAnotherInfo.getNumber());
+        sendMoney.sendMoney(20, cardAnotherInfo.getNumber());
 
-        int actual = dashboardPage.getCardBalance("5559 0000 0000 0001");
+        int actual = dashboardPage.getCardBalance(cardInfo.getNumber());
         assertEquals(expected, actual);
-        int actual2 = dashboardPage.getCardBalance("5559 0000 0000 0002");
+        int actual2 = dashboardPage.getCardBalance(cardAnotherInfo.getNumber());
         assertEquals(expected2, actual2);
+    }
+
+    @Test
+    void shouldTransferMoneyOverLimit() {
+        int expected = dashboardPage.getCardBalance(cardInfo.getNumber());
+        int expected2 = dashboardPage.getCardBalance(cardAnotherInfo.getNumber());
+
+        var sendMoney = dashboardPage.sendMoneyById(cardInfo.getNumber());
+        sendMoney.sendMoney(30_000, cardAnotherInfo.getNumber());
+
+        int actual = dashboardPage.getCardBalance(cardInfo.getNumber());
+        assertEquals(expected, actual);
+        int actual2 = dashboardPage.getCardBalance(cardAnotherInfo.getNumber());
+        assertEquals(expected2, actual2);
+
     }
 }
